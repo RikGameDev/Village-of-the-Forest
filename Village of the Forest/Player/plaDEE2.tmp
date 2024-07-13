@@ -1,0 +1,234 @@
+[gd_scene load_steps=13 format=3 uid="uid://yokpq1sjqx81"]
+
+[ext_resource type="Texture2D" uid="uid://biiehs7wc11jr" path="res://assets/My version of cool adventure.png" id="2_fsht4"]
+[ext_resource type="Script" path="res://Player/scripts/player_state_machine.gd" id="2_o2khe"]
+
+[sub_resource type="GDScript" id="GDScript_00epk"]
+script/source = "extends CharacterBody2D
+
+var cardinal_direction = Vector2.DOWN
+var direction = Vector2.ZERO
+var movement_speed = 40.0
+var state : String = \"idle\"
+
+@onready var animation_player = $AnimationPlayer
+@onready var sprite = $Sprite2D
+
+
+func _ready():
+	pass
+
+func _process(delta):
+	direction.x = Input.get_action_strength(\"right\") - Input.get_action_strength(\"left\")
+	direction.y = Input.get_action_strength(\"down\") - Input.get_action_strength(\"up\")
+	velocity = direction.normalized()*movement_speed
+	
+	if SetState() == true || SetDirection() == true:
+		UpdateAnimation()
+	
+	pass
+
+func _physics_process(_delta):
+	move_and_slide()
+
+
+func SetDirection() -> bool:
+	var new_dir : Vector2 = cardinal_direction
+	if direction == Vector2.ZERO:
+		return false
+	
+	if direction.y == 0:
+		new_dir = Vector2.LEFT if direction.x < 0 else Vector2.RIGHT
+	elif direction.x == 0:
+		new_dir = Vector2.UP if direction.y < 0 else Vector2.DOWN
+	
+	if new_dir == cardinal_direction:
+		return false
+	
+	cardinal_direction = new_dir
+	sprite.scale.x = -1 if cardinal_direction == Vector2.LEFT else 1
+	return true
+
+
+
+
+func SetState() -> bool:
+	var new_state : String = \"idle\" if direction == Vector2.ZERO else \"walk\"
+	if new_state == state:
+		return false
+	state = new_state
+	return true
+
+
+func UpdateAnimation() -> void:
+	animation_player.play( state + \"_\" + AnimDirection() )
+	pass
+
+
+
+func AnimDirection() -> String:
+	if cardinal_direction == Vector2.DOWN:
+		return \"down\"
+	elif cardinal_direction == Vector2.UP:
+		return \"up\"
+	else:
+		return \"side\"
+	
+
+
+"
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_714o0"]
+radius = 8.0
+height = 40.0
+
+[sub_resource type="Animation" id="Animation_kfbc8"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0]
+}
+
+[sub_resource type="Animation" id="Animation_iufb3"]
+resource_name = "idle_down"
+length = 0.2
+loop_mode = 2
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 1,
+"values": [0, 1, 2]
+}
+
+[sub_resource type="Animation" id="Animation_oyyu6"]
+resource_name = "idle_side"
+length = 0.2
+loop_mode = 2
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 1,
+"values": [14, 15, 16]
+}
+
+[sub_resource type="Animation" id="Animation_wdw47"]
+resource_name = "idle_up"
+length = 0.2
+loop_mode = 2
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 1,
+"values": [7, 8, 9]
+}
+
+[sub_resource type="Animation" id="Animation_sxi0s"]
+resource_name = "walk_down"
+length = 0.3
+loop_mode = 2
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 1,
+"values": [3, 4, 5, 6]
+}
+
+[sub_resource type="Animation" id="Animation_avy05"]
+resource_name = "walk_side"
+length = 0.3
+loop_mode = 2
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 1,
+"values": [17, 18, 19, 20]
+}
+
+[sub_resource type="Animation" id="Animation_b3n6k"]
+resource_name = "walk_up"
+length = 0.3
+loop_mode = 2
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 1,
+"values": [10, 11, 12, 13]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_4a15e"]
+_data = {
+"RESET": SubResource("Animation_kfbc8"),
+"idle_down": SubResource("Animation_iufb3"),
+"idle_side": SubResource("Animation_oyyu6"),
+"idle_up": SubResource("Animation_wdw47"),
+"walk_down": SubResource("Animation_sxi0s"),
+"walk_side": SubResource("Animation_avy05"),
+"walk_up": SubResource("Animation_b3n6k")
+}
+
+[node name="Player" type="CharacterBody2D"]
+motion_mode = 1
+script = SubResource("GDScript_00epk")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CapsuleShape2D_714o0")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("2_fsht4")
+hframes = 21
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_4a15e")
+}
+
+[node name="StateMachine" type="Node" parent="."]
+script = ExtResource("2_o2khe")
+
+[node name="idle" type="Node" parent="StateMachine"]
+
+[node name="walk" type="Node" parent="StateMachine"]
